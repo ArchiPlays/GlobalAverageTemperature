@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Data APIS</title>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
+    </head>
+
+    <body>
+        <canvas id="chart" width="1000" height="400"></canvas>
+        <script>
+            const xlabels = [];
+            const ytemps = [];
+            chartIt();
+            getTest();
+            async function chartIt() {
+                await getTest();
+                const ctx = document.getElementById('chart').getContext('2d');
+                const myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: xlabels,
+                        datasets: [{
+                            fill: false,
+                            label: 'Global Average Temperature',
+                            data: ytemps,
+                            backgroundColor: 
+                            'rgba(255, 99, 132, 0.2)'
+                            ,
+                            borderColor: [
+                            'rgba(255, 99, 132, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    callback: function(value, index, values) {
+                                        return value + '°';
+                                    }
+                                }
+                            }]
+                        }
+                    }
+                });
+            }
+
+            //
+
+            getTest();
+
+            async function getTest() {
+                const response = await fetch('ZonAnn.Ts+dSST.csv');
+                const data = await response.text();
+
+                const rows = data.split('\n').slice(1);
+                rows.forEach(elt => {
+                    const row = elt.split(',');
+                    const year = row[0];
+                    xlabels.push(year);
+                    const temp = row[1];
+                    ytemps.push(parseFloat(temp) + 14);
+                    console.log(year, temp);
+                });
+            }
+        </script>
+    </body>
+
+</html>
